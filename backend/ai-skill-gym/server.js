@@ -132,10 +132,7 @@ const PORT = process.env.PORT || 5000;
 
 const start = async () => {
   try {
-    // Temporarily skip DB connection for testing - MongoDB Atlas auth needs fixing
-    // await connectDB();
-    console.log('⚠️  Skipping MongoDB connection (Atlas auth issue)');
-    console.log('💡 Server will run on port 4000 without database');
+    await connectDB();
     app.listen(PORT, () => {
       console.log(`\n🚀 AI Skill Gym Backend running on port ${PORT}`);
       console.log(`📚 Environment: ${process.env.NODE_ENV || 'development'}`);
