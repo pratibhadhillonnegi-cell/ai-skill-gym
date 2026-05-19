@@ -9,8 +9,8 @@
 services:
   - type: web
     name: ai-skill-gym-backend
-    repo: https://github.com/YOUR_USERNAME/ai-skill-gym  # UPDATE THIS
-    branch: main
+    repo: https://github.com/pratibhadhillonnegi-cell/ai-skill-gym
+    branch: master
     env: node
     buildCommand: "cd backend/ai-skill-gym && npm install && npm run build"
     startCommand: "cd backend/ai-skill-gym && npm start"
