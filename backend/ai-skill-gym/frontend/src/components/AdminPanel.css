@@ -1,0 +1,406 @@
+.admin-panel {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.admin-header h2 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-actions button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-actions button:first-child {
+  background: #3498db;
+  color: white;
+}
+
+.admin-actions button:first-child:hover {
+  background: #2980b9;
+}
+
+.admin-actions button:last-child {
+  background: #95a5a6;
+  color: white;
+}
+
+.admin-actions button:last-child:hover {
+  background: #7f8c8d;
+}
+
+.exercise-form {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.exercise-form h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.outcome-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.outcome-input input {
+  flex: 1;
+}
+
+.outcome-input button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.form-actions button:first-child {
+  background: #27ae60;
+  color: white;
+}
+
+.form-actions button:last-child {
+  background: #95a5a6;
+  color: white;
+}
+
+.exercises-list h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.exercise-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.exercise-header h4 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.exercise-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.exercise-actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.exercise-actions button:first-child {
+  background: #f39c12;
+  color: white;
+}
+
+.exercise-actions button.delete-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.challenge-preview {
+  color: #555;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.exercise-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.admin-header h2 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-actions button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-actions button:first-child {
+  background: #3498db;
+  color: white;
+}
+
+.admin-actions button:first-child:hover {
+  background: #2980b9;
+}
+
+.admin-actions button:last-child {
+  background: #95a5a6;
+  color: white;
+}
+
+.admin-actions button:last-child:hover {
+  background: #7f8c8d;
+}
+
+.exercise-form {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.exercise-form h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.outcome-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.outcome-input input {
+  flex: 1;
+}
+
+.outcome-input button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.form-actions button:first-child {
+  background: #27ae60;
+  color: white;
+}
+
+.form-actions button:last-child {
+  background: #95a5a6;
+  color: white;
+}
+
+.exercises-list h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.exercise-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.exercise-header h4 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.exercise-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.exercise-actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.exercise-actions button:first-child {
+  background: #f39c12;
+  color: white;
+}
+
+.exercise-actions button.delete-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.challenge-preview {
+  color: #555;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.exercise-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}

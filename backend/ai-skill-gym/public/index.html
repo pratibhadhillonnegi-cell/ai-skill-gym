@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skill Gym - Train your prompt IQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Level Selector */
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .level-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: none;
+            font-size: 1rem;
+        }
+
+        .level-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-card h4 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Exercise View */
+        .exercise-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .exercise-header h2 {
+            color: #333;
+            margin-bottom: 0.75rem;
+            font-size: 1.8rem;
+        }
+
+        .topic-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .exercise-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .exercise-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .challenge-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .challenge-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .challenge-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            color: #666;
+        }
+
+        .info-box li {
+            padding: 0.4rem 0;
+            font-size: 0.9rem;
+        }
+
+        .info-box li:before {
+            content: '✓ ';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        /* Form */
+        .prompt-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group textarea {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .char-count {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-right: 0.5rem;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #f5f5f5;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .button-group .btn {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        /* Critique Display */
+        .critique-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .critique-header h2 {
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .critique-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .critique-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .critique-text {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .improved-prompt-box {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.7;
+            color: #333;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .explanation-text {
+            color: #555;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            color: #d32f2f;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🎓 AI Skill Gym</h1>
+        <p>Train your prompt IQ</p>
+    </header>
+
+    <div class="container">
+        <!-- Level Selector -->
+        <div id="levelSelector" class="content active">
+            <h2 style="text-align: center; color: white; margin-bottom: 2rem;">Choose Your Level</h2>
+            <div class="levels-grid" id="levelsGrid"></div>
+        </div>
+
+        <!-- Exercise View -->
+        <div id="exerciseView" class="content">
+            <button class="btn btn-back" onclick="goToLevels()">← Back to Levels</button>
+            <div class="exercise-header">
+                <h2 id="exerciseTitle"></h2>
+                <span class="topic-tag" id="topicTag"></span>
+            </div>
+            <div class="exercise-content">
+                <div class="challenge-section">
+                    <h3>📋 Challenge</h3>
+                    <p class="challenge-text" id="challengeText"></p>
+                    <div class="info-box" id="contextBox" style="display:none;">
+                        <h4>Context</h4>
+                        <p id="contextText"></p>
+                    </div>
+                    <div class="info-box" id="outcomesBox" style="display:none;">
+                        <h4>✓ Expected Outcomes</h4>
+                        <ul id="outcomesList"></ul>
+                    </div>
+                </div>
+
+                <form class="prompt-form" onsubmit="submitPrompt(event)">
+                    <div class="form-group">
+                        <label for="promptInput">Your Prompt</label>
+                        <textarea id="promptInput" placeholder="Write your prompt here..." disabled></textarea>
+                        <div class="char-count">
+                            <span id="charCount">0</span> characters
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>✨ Get AI Critique</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Critique Display -->
+        <div id="critiqueView" class="content">
+            <button class="btn btn-back" onclick="goToLevels()">← Back to Levels</button>
+            <div class="critique-header">
+                <h2>AI Critique</h2>
+                <div class="score-badge">Score: <span id="score"></span>/10</div>
+            </div>
+
+            <div class="critique-section">
+                <h3>📝 Critique</h3>
+                <p class="critique-text" id="critiqueText"></p>
+            </div>
+
+            <div class="critique-section">
+                <h3>⭐ Improved Prompt</h3>
+                <div class="improved-prompt-box" id="improvedPrompt"></div>
+            </div>
+
+            <div class="critique-section">
+                <h3>💡 Why It's Better</h3>
+                <div class="explanation-text" id="explanationText"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="retryExercise()">← Try Again</button>
+                <button class="btn btn-primary" onclick="nextExercise()">🎲 Next Exercise</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let currentLevel = null;
+        let currentExercise = null;
+
+        const LEVELS = [
+            { number: 1, title: 'AI Literacy', description: 'Learn the fundamentals of AI and language models', icon: '🧠' },
+            { number: 2, title: 'Structured Prompting', description: 'Master advanced prompt engineering techniques', icon: '🎯' },
+            { number: 3, title: 'Applied Tracks', description: 'Real-world applications across different domains', icon: '🚀' },
+            { number: 4, title: 'Optimization', description: 'Advanced techniques for production use', icon: '⚡' }
+        ];
+
+        // Initialize
+        function init() {
+            renderLevels();
+            setupPromptCounter();
+        }
+
+        function renderLevels() {
+            const grid = document.getElementById('levelsGrid');
+            grid.innerHTML = LEVELS.map(level => `
+                <button class="level-card" onclick="selectLevel(${level.number})">
+                    <div class="level-icon">${level.icon}</div>
+                    <h3>Level ${level.number}</h3>
+                    <h4>${level.title}</h4>
+                    <p>${level.description}</p>
+                </button>
+            `).join('');
+        }
+
+        async function selectLevel(levelNumber) {
+            currentLevel = levelNumber;
+            try {
+                const response = await fetch(`${API_URL}/exercises/random/${levelNumber}`);
+                const exercise = await response.json();
+                displayExercise(exercise);
+            } catch (error) {
+                console.error('Error loading exercise:', error);
+                alert('Failed to load exercise. Make sure the backend is running.');
+            }
+        }
+
+        function displayExercise(exercise) {
+            currentExercise = exercise;
+            document.getElementById('exerciseTitle').textContent = exercise.title;
+            document.getElementById('topicTag').textContent = exercise.topic;
+            document.getElementById('challengeText').textContent = exercise.challenge;
+
+            if (exercise.context) {
+                document.getElementById('contextText').textContent = exercise.context;
+                document.getElementById('contextBox').style.display = 'block';
+            }
+
+            if (exercise.expectedOutcomes && exercise.expectedOutcomes.length > 0) {
+                const list = document.getElementById('outcomesList');
+                list.innerHTML = exercise.expectedOutcomes.map(o => `<li>${o}</li>`).join('');
+                document.getElementById('outcomesBox').style.display = 'block';
+            }
+
+            document.getElementById('promptInput').value = '';
+            document.getElementById('promptInput').disabled = false;
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('submitBtn').disabled = true;
+
+            showPage('exerciseView');
+        }
+
+        function setupPromptCounter() {
+            const input = document.getElementById('promptInput');
+            input.addEventListener('input', (e) => {
+                document.getElementById('charCount').textContent = e.target.value.length;
+                document.getElementById('submitBtn').disabled = !e.target.value.trim();
+            });
+        }
+
+        async function submitPrompt(e) {
+            e.preventDefault();
+            const userPrompt = document.getElementById('promptInput').value.trim();
+            if (!userPrompt) return;
+
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Getting AI Critique...';
+
+            try {
+                const response = await fetch(`${API_URL}/submissions/critique`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        exerciseId: currentExercise._id,
+                        userPrompt: userPrompt
+                    })
+                });
+
+                const result = await response.json();
+                displayCritique(result);
+            } catch (error) {
+                console.error('Error submitting prompt:', error);
+                alert('Failed to get critique. Make sure the backend is running.');
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = '✨ Get AI Critique';
+            }
+        }
+
+        function displayCritique(critique) {
+            document.getElementById('score').textContent = critique.score;
+            document.getElementById('critiqueText').textContent = critique.critique;
+            document.getElementById('improvedPrompt').textContent = critique.improvedPrompt;
+            document.getElementById('explanationText').textContent = critique.explanation;
+            showPage('critiqueView');
+        }
+
+        async function nextExercise() {
+            document.querySelector('.button-group').style.pointerEvents = 'none';
+            try {
+                const response = await fetch(`${API_URL}/exercises/random/${currentLevel}`);
+                const exercise = await response.json();
+                displayExercise(exercise);
+            } catch (error) {
+                console.error('Error loading exercise:', error);
+                alert('Failed to load next exercise.');
+            } finally {
+                document.querySelector('.button-group').style.pointerEvents = 'auto';
+            }
+        }
+
+        function retryExercise() {
+            displayExercise(currentExercise);
+        }
+
+        function goToLevels() {
+            showPage('levelSelector');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+
+</html>

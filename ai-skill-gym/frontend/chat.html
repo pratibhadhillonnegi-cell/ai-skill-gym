@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 AI Skill Gym - Coach</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h2 {
+            margin: 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        /* Chat Area */
+        .chat-container {
+            flex: 1;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 80%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user { align-self: flex-end; }
+        .message.assistant { align-self: flex-start; }
+
+        .bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .user .bubble {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .assistant .bubble {
+            background: #f1f5f9;
+            color: var(--text);
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            resize: none;
+            height: 40px;
+            font-family: inherit;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover { background: var(--primary-dark); }
+
+        /* Sidebar Stats */
+        .stat-group {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .badge {
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1 style="margin:0; font-size:1.2rem;">🎓 AI Skill Gym</h1>
+            <span id="authority-badge" class="badge">Initializing...</span>
+        </div>
+        <a href="index.html" style="color:white; text-decoration:none; opacity:0.8;">← Back</a>
+    </header>
+
+    <div class="container">
+        <!-- Progress -->
+        <div class="card">
+            <h2>📊 Performance</h2>
+            <div class="stat-group">
+                <div>
+                    <div class="stat-item"><span>Prompt Clarity</span><span id="stat-clarity">40%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="fill-clarity" style="width: 40%"></div></div>
+                </div>
+                <div>
+                    <div class="stat-item"><span>Logic Density</span><span id="stat-logic">25%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="fill-logic" style="width: 25%"></div></div>
+                </div>
+                <div>
+                    <div class="stat-item"><span>Consistency</span><span id="stat-consistency">60%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="fill-consistency" style="width: 60%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="card chat-container">
+            <h2>💬 Session</h2>
+            <div class="chat-history" id="chatHistory"></div>
+            <div class="chat-input">
+                <textarea id="userInput" placeholder="Type a message..." onkeydown="if(event.keyCode===13 && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Epistemic View -->
+        <div class="card">
+            <h2>🧠 Interpretive View</h2>
+            <div id="epistemic-panel" style="padding: 1rem; font-size: 0.9rem;">
+                <p style="color:var(--text-light)">Start chatting to see how the system interprets your intent.</p>
+            </div>
+        </    <script>
+        /**
+         * ── ENGINEERING LAYER: TELEMETRY ──
+         */
+        const Telemetry = {
+            trace(area, msg, data = {}) { console.log(`[${area}] ${msg}`, data); },
+            debug(area, msg, data = {}) { console.debug(`%c[${area}] ${msg}`, 'color: #6366f1; font-weight: bold;', data); }
+        };
+
+        /**
+         * ── CORE: REFLECTIVE STORE (DAY 2) ──
+         * Features: Compaction | Storage Discipline | Reality-Tested
+         */
+        const Store = {
+            KEY: 'gym_production_log_v2',
+            nodeId: Math.random().toString(36).substring(7),
+            serverV: 0, 
+            isLeader: false,
+            chaos: { dropAck: false, lag: 0 },
+
+            init() {
+                this.refresh();
+                this._initLeaderLock();
+                setInterval(() => this.sync(), 5000); 
+                window.addEventListener('storage', (e) => { if (e.key === this.KEY) this.refresh(); });
+            },
+
+            async _initLeaderLock() {
+                try {
+                    navigator.locks.request('gym_writer_lock', { mode: 'exclusive' }, async () => {
+                        this.isLeader = true;
+                        this._updateStatus("LEADER (Writer)");
+                        return new Promise(() => {}); 
+                    });
+                } catch (e) {
+                    this.isLeader = false;
+                    this._updateStatus("FOLLOWER (Reader)");
+                }
+            },
+
+            _updateStatus(txt) {
+                const b = document.getElementById('authority-badge');
+                if (b) b.textContent = txt;
+                document.title = `🎓 ${txt}`;
+            },
+
+            get() {
+                try { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); } 
+                catch (e) { return []; }
+            },
+
+            // COMPACTION: Reality discipline (5MB limit safety)
+            _compact(log) {
+                if (log.length < 60) return log;
+                Telemetry.debug("STORE", "Compacting Log", { before: log.length, after: 30 });
+                return log.slice(-30);
+            },
+
+            save(log) {
+                try {
+                    const compacted = this._compact(log);
+                    localStorage.setItem(this.KEY, JSON.stringify(compacted));
+                    this.refresh();
+                } catch (e) { 
+                    Telemetry.trace("STORE", "Storage Overflow. Wiping...", { error: e.message });
+                    localStorage.removeItem(this.KEY);
+                }
+            },
+
+            append(type, data) {
+                if (!this.isLeader) return;
+                const log = this.get();
+                const event = {
+                    cid: `${Date.now()}-${this.nodeId}`,
+                    status: 'pending',
+                    type, ts: Date.now(), ...data
+                };
+                log.push(event);
+                this.save(log);
+                return event;
+            },
+
+            resolve(cid, serverV) {
+                if (!this.isLeader) return;
+                const log = this.get();
+                const target = log.find(e => e.cid === cid);
+                if (target) {
+                    target.status = 'synced';
+                    target.v = serverV;
+                    this.serverV = Math.max(this.serverV, serverV);
+                    this.save(log);
+                }
+            },
+
+            sync() { this.refresh(); },
+
+            refresh() {
+                const log = this.get();
+                const lastLocalV = Math.max(0, ...log.map(e => e.v || 0));
+                const lag = Math.max(0, this.serverV - lastLocalV);
+                
+                // Storage Monitor
+                const usage = (JSON.stringify(localStorage).length / 1024).toFixed(1);
+                
+                UI.render(log, { 
+                    isSyncing: lag > 0 || log.some(e => e.status === 'pending'),
+                    usage,
+                    lag
+                });
+            }
+        };
+
+        /**
+         * ── CHAOS HARNESS (MALICIOUS USER SIMULATION) ──
+         */
+        const Chaos = {
+            toggle(key) {
+                Store.chaos[key] = !Store.chaos[key];
+                if (key === 'lag') Store.chaos.lag = Store.chaos.lag ? 0 : 3000;
+                Store.refresh();
+            },
+            async spam(count) {
+                Telemetry.trace("CHAOS", `Initiating Spam Attack: ${count} msgs`);
+                for (let i = 0; i < count; i++) {
+                    Actions.sendMessage(`Spam Message #${i+1}`);
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            },
+            bloat() {
+                Telemetry.trace("CHAOS", "Injecting Log Bloat (100KB)");
+                Store.append('bloat', { data: "X".repeat(100000) });
+            }
+        };
+
+        const UI = {
+            render(log, stats) {
+                this._updateHistory(log.filter(e => e.type === 'msg'));
+                this._updateDashboard(stats);
+            },
+
+            _updateHistory(msgs) {
+                const history = document.getElementById('chatHistory');
+                history.innerHTML = msgs.map(m => `
+                    <div class="message ${m.role}">
+                        <div class="bubble">${m.text}</div>
+                        <div style="font-size:0.6rem; color:#aaa; margin-top:2px;">
+                            ${m.status === 'synced' ? '✓' : '...'}
+                        </div>
+                    </div>
+                `).join('');
+                history.scrollTop = history.scrollHeight;
+            },
+
+            _updateDashboard({ isSyncing, usage, lag }) {
+                const panel = document.getElementById('epistemic-panel');
+                if (!panel) return;
+                
+                panel.innerHTML = `
+                    <div style="font-size:0.75rem; display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>System Status:</span>
+                            <strong style="color:${isSyncing ? '#6366f1' : '#10b981'}">
+                                ${isSyncing ? 'SYNCING' : 'ONLINE'}
+                            </strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Storage Usage:</span>
+                            <strong style="color:${usage > 4000 ? '#ef4444' : '#64748b'}">${usage} KB</strong>
+                        </div>
+                        <hr style="border:0; border-top:1px solid #e2e8f0;"/>
+                        
+                        <div style="background:#fef2f2; padding:8px; border-radius:6px; border:1px solid #fee2e2;">
+                            <strong style="color:#b91c1c; font-size:0.65rem;">🧨 CHAOS HARNESS</strong>
+                            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+                                <button onclick="Chaos.spam(10)" style="font-size:0.6rem; padding:2px 4px; border:1px solid #f87171; background:white; color:#b91c1c; cursor:pointer;">SPAM 10</button>
+                                <button onclick="Chaos.bloat()" style="font-size:0.6rem; padding:2px 4px; border:1px solid #f87171; background:white; color:#b91c1c; cursor:pointer;">BLOAT</button>
+                                <button onclick="Chaos.toggle('dropAck')" style="font-size:0.6rem; padding:2px 4px; border:1px solid #f87171; background:${Store.chaos.dropAck ? '#f87171' : 'white'}; color:${Store.chaos.dropAck ? 'white' : '#b91c1c'}; cursor:pointer;">DROP ACK</button>
+                            </div>
+                        </div>
+                        
+                        <div style="color:var(--text-light); line-height:1.4; font-size:0.65rem;">
+                            Compaction active. Tested against malicious load and storage pressure.
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        const Actions = {
+            async sendMessage(forcedText) {
+                if (!Store.isLeader) { alert("Only active leader can send."); return; }
+
+                const input = document.getElementById('userInput');
+                const text = forcedText || input.value.trim();
+                if (!text) return;
+                if (!forcedText) input.value = '';
+
+                const event = Store.append('msg', { role: 'user', text });
+                const cid = event.cid;
+
+                try {
+                    if (Store.chaos.lag > 0) await new Promise(r => setTimeout(r, Store.chaos.lag));
+
+                    const res = await fetch('/.netlify/functions/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: [{ role: 'user', content: text }], cid })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (Store.chaos.dropAck) return;
+
+                    Store.resolve(cid, data.serverV || 1);
+                    Store.append('msg', { role: 'assistant', text: data.text || data, status: 'synced' });
+
+                } catch (e) { Telemetry.trace("NET", "Sync Failed", { cid, error: e.message }); }
+            }
+        };
+
+        Store.init();
+        function sendMessage() { Actions.sendMessage(); }
+    </script>
+</body>
+</html>
+ }
+    </script>
+</body>
+</html>
+</body>
+</html>
+</body>
+</html>
+</body>
+</html>

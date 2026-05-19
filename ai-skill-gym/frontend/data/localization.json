@@ -1,0 +1,32 @@
+{
+  "US": {
+    "pricing.monthly": "$29/mo",
+    "cta.start": "Start Training",
+    "contact.phone": "+1 (800) 555-0199",
+    "date.format": "MM/DD/YYYY"
+  },
+  "GB": {
+    "pricing.monthly": "£25/mo",
+    "cta.start": "Start Training Now",
+    "contact.phone": "+44 20 7123 4567",
+    "date.format": "DD/MM/YYYY"
+  },
+  "DE": {
+    "pricing.monthly": "€29/mo",
+    "cta.start": "Training Beginnen",
+    "contact.phone": "+49 30 12345678",
+    "date.format": "DD.MM.YYYY"
+  },
+  "FR": {
+    "pricing.monthly": "€29/mo",
+    "cta.start": "Commencer l'entraînement",
+    "contact.phone": "+33 1 23 45 67 89",
+    "date.format": "DD/MM/YYYY"
+  },
+  "JP": {
+    "pricing.monthly": "¥4,000/月",
+    "cta.start": "トレーニングを開始",
+    "contact.phone": "+81 3-1234-5678",
+    "date.format": "YYYY/MM/DD"
+  }
+}

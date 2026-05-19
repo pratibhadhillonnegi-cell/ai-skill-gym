@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+    <title>AI Skill Gym Insights</title>
+    <link>https://ai-skill-gym.netlify.app/blog/</link>
+    <description>Practical AI skill-building through real-world application.</description>
+    <item>
+        <title>5 Prompt Mistakes That Kill Output Quality</title>
+        <link>https://ai-skill-gym.netlify.app/blog/posts/post-2.html</link>
+        <description>Are your AI results feeling generic? The issue is likely in how you structure constraints. We break down the top 5 mistakes and how to fix them instantly.</description>
+        <pubDate>Fri, 15 May 2026 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+        <title>Why Most Prompts Fail (And How to Fix Them)</title>
+        <link>https://ai-skill-gym.netlify.app/blog/posts/post-1.html</link>
+        <description>Turning vague ideas into high-precision prompts is the foundation of AI literacy. Here is the before-and-after of prompt transformations that actually work.</description>
+        <pubDate>Sun, 10 May 2026 00:00:00 +0000</pubDate>
+    </item>
+</channel>
+</rss>

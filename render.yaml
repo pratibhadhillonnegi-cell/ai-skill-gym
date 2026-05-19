@@ -1,0 +1,138 @@
+# Render deployment configuration for AI Skill Gym
+# Full documentation at: https://render.com/docs/infrastructure-as-code
+#
+# To deploy:
+# 1. Commit this file to your repo
+# 2. On Render dashboard, create a new "Blueprint" from this repo
+# 3. Render will auto-detect render.yaml and deploy accordingly
+
+services:
+  - type: web
+    name: ai-skill-gym-backend
+    repo: https://github.com/YOUR_USERNAME/ai-skill-gym  # UPDATE THIS
+    branch: main
+    env: node
+    buildCommand: "cd backend/ai-skill-gym && npm install && npm run build"
+    startCommand: "cd backend/ai-skill-gym && npm start"
+    plan: free
+    envVars:
+      # Core Configuration
+      - key: PORT
+        value: "4000"
+      - key: NODE_ENV
+        value: production
+      
+      # Database Configuration
+      - key: MONGODB_URI
+        sync: false
+        # Set this in Render dashboard: mongodb+srv://user:password@cluster.mongodb.net/ai-skill-gym
+      
+      # Authentication & Security
+      - key: JWT_SECRET
+        sync: false
+        # Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+      
+      - key: FRONTEND_URL
+        value: https://ai-skill-gym-backend.onrender.com
+      
+      # AI Provider Configuration
+      - key: AI_PROVIDER
+        value: groq
+        # Options: 'openai', 'ollama', 'groq', 'mock'
+      
+      # OpenAI Configuration (if using OpenAI)
+      - key: OPENAI_API_KEY
+        sync: false
+        # Get from: https://platform.openai.com/api-keys
+      
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+        # Options: gpt-4o-mini, gpt-3.5-turbo, gpt-4, etc.
+      
+      # Groq Configuration (if using Groq)
+      - key: GROQ_API_KEY
+        sync: false
+        # Get from: https://console.groq.com/keys
+      
+      - key: GROQ_API_BASE_URL
+        value: https://api.groq.com/v1
+        # Use Groq's endpoint for OpenAI-compatible access
+
+      - key: GROQ_MODEL
+        value: llama-3.1-8b-instant
+        # Options: llama-3.1-8b-instant, llama-3.1-70b-versatile, llama-3.1-405b-reasoning, mixtral-8x7b-32768, etc.
+
+      - key: GROQ_TEMPERATURE
+        value: "0.7"
+
+      - key: GROQ_TOP_P
+        value: "0.95"
+
+      - key: GROQ_MAX_TOKENS
+        value: "500"
+
+      - key: GROQ_TIMEOUT
+        value: "120000"
+
+      - key: GROQ_CACHE_ENABLED
+        value: "false"
+        # Set to true to cache repeated prompt responses and reduce latency for repeated requests.
+      
+      # Google Search API Configuration
+      - key: SERPER_API_KEY
+        sync: false
+        # Serper API key for high-speed structured Google search results
+        # Get from: https://serper.dev/
+
+      - key: SERPER_API_BASE_URL
+        value: https://google.serper.dev
+        # Use Serper's base URL for all Google search endpoints
+
+      - key: SERPER_TIMEOUT
+        value: "60000"
+        # Request timeout in milliseconds for Serper requests
+
+
+# Environment Variables Setup Instructions:
+# 
+# 1. MONGODB_URI (required)
+#    - Sign up for MongoDB Atlas: https://www.mongodb.com/cloud/atlas
+#    - Create a free cluster
+#    - Get connection string: mongodb+srv://user:pass@cluster.mongodb.net/ai-skill-gym
+#    - Set in Render Dashboard (mark as secret if sensitive)
+#
+# 2. JWT_SECRET (required, secret)
+#    - Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+#    - Must be at least 32 characters
+#    - Set in Render Dashboard (mark as secret)
+#
+# 3. OPENAI_API_KEY (if using OpenAI)
+#    - Get from: https://platform.openai.com/api-keys
+#    - Set in Render Dashboard (mark as secret)
+#
+# 4. SENTRY_DSN (optional)
+#    - For error tracking, sign up at https://sentry.io
+#    - Get DSN from project settings
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      
+      # Ollama Configuration (if AI_PROVIDER=ollama)
+      - key: OLLAMA_API
+        value: http://localhost:11434/api/generate
+      - key: OLLAMA_MODEL
+        value: mistral
+      
+      # Monitoring
+      - key: SENTRY_DSN
+        value: https://key@sentry.io/project_id
+      
+      # Optional: Custom domain
+      # After deployment, go to service Settings -> Custom Domain
+
+# Notes:
+# 1. Replace YOUR_GITHUB_REPO_URL with your actual repo URL
+# 2. For MongoDB: Use Atlas (free tier available at mongodb.com/cloud/atlas)
+# 3. For JWT_SECRET: Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# 4. For OpenAI API key: Get from https://platform.openai.com/api-keys
+# 5. Pay-as-you-go pricing applies for API calls (OpenAI, etc.)
+# 6. Render free tier: 400 compute hours/month

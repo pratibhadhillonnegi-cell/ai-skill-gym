@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skill Gym - App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .card h1 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Welcome to AI Skill Gym</h1>
+        <p style="margin-bottom: 2rem;">Practice real-world AI tasks, get scored instantly, and improve faster with structured challenges and feedback.</p>
+
+        <!-- Email Signup Form -->
+        <form data-netlify="true" name="signup-form" method="POST" onsubmit="submitSignup(event)">
+            <input type="hidden" name="form-name" value="signup-form" />
+            <p style="display: none;">
+                <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+            </p>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com">
+            </div>
+            <button type="submit" class="btn" data-localize="cta.start">Start Training</button>
+            <p id="signup-success" class="hidden" style="color: #3c3; margin-top: 1rem;">Success! Redirecting...</p>
+        </form>
+    </div>
+
+    <script>
+        function submitSignup(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(() => {
+                document.getElementById('signup-success').classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = 'chat.html'; // Go to training interface
+                }, 1500);
+            })
+            .catch(err => alert("Error: " + err));
+        }
+    </script>
+</body>
+</html>

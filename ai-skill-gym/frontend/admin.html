@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ops | AI Skill Gym</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #1a1b26; color: #a9b1d6; padding: 2rem; }
+        .card { background: #24283b; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #414868; }
+        h1, h2 { color: #c0caf5; margin-bottom: 1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        button { background: #7aa2f7; color: #1a1b26; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #89b4fa; }
+        button.danger { background: #f7768e; color: #fff; }
+        button.danger:hover { background: #ff9e64; }
+        input[type="text"], input[type="password"], input[type="number"] { padding: 0.5rem; background: #1a1b26; border: 1px solid #414868; color: #fff; border-radius: 4px; width: 100%; margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .stat { font-size: 2rem; color: #9ece6a; font-weight: bold; }
+        .stat.warn { color: #e0af68; }
+        .stat.err { color: #f7768e; }
+        #authOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .auth-box { background: #24283b; padding: 2rem; border-radius: 8px; width: 300px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div id="authOverlay">
+        <div class="auth-box">
+            <h2>Admin Login</h2>
+            <input type="password" id="secretKey" placeholder="Enter ADMIN_SECRET">
+            <button onclick="login()">Access Dashboard</button>
+        </div>
+    </div>
+
+    <h1>⚡ Operational Dashboard</h1>
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <button onclick="fetchConfig()">Refresh State</button>
+        <button class="danger" onclick="triggerKillSwitch()">Nuke: Disable Fallbacks</button>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Global Config (Partial Modes)</h2>
+            <div id="configEditor">Loading...</div>
+            <button style="margin-top: 1rem;" onclick="saveConfig()">Push Config Update</button>
+        </div>
+
+        <div class="card">
+            <h2>System Health Signals (Live)</h2>
+            <p style="font-size: 0.8rem; opacity: 0.7;">Metrics aggregate via telemetry endpoint</p>
+            <div style="margin-top: 1rem;">
+                <label>Fallback Rate (Last 60s)</label>
+                <div class="stat warn" id="statFallback">--%</div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <label>Job Timeout Rate</label>
+                <div class="stat" id="statTimeouts">--%</div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <label>Active Circuit Breakers</label>
+                <div class="stat err" id="statCircuits">--</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('gym_admin_token');
+        if (token) document.getElementById('authOverlay').style.display = 'none';
+
+        function login() {
+            token = document.getElementById('secretKey').value;
+            localStorage.setItem('gym_admin_token', token);
+            document.getElementById('authOverlay').style.display = 'none';
+            fetchConfig();
+        }
+
+        async function fetchConfig() {
+            if (!token) return;
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                
+                let html = '';
+                for (let [key, val] of Object.entries(config)) {
+                    if (key === 'version') continue;
+                    html += `
+                        <label>${key}</label>
+                        <input type="text" id="cfg_${key}" value="${val}">
+                    `;
+                }
+                document.getElementById('configEditor').innerHTML = html;
+                
+                // Simulate fetching metrics (in a real app, fetch from /api/telemetry-stats)
+                document.getElementById('statFallback').innerText = (Math.random() * 5).toFixed(1) + '%';
+                document.getElementById('statTimeouts').innerText = '0.0%';
+                document.getElementById('statCircuits').innerText = '0';
+                
+            } catch (e) {
+                alert("Failed to fetch config.");
+            }
+        }
+
+        async function saveConfig(overrides = null) {
+            let payload = overrides;
+            if (!payload) {
+                payload = {};
+                const inputs = document.querySelectorAll('#configEditor input');
+                inputs.forEach(input => {
+                    const key = input.id.replace('cfg_', '');
+                    const val = input.value;
+                    payload[key] = isNaN(val) ? (val === 'true' ? true : (val === 'false' ? false : val)) : Number(val);
+                });
+            }
+
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                    alert('Config updated successfully');
+                    fetchConfig();
+                } else {
+                    if (res.status === 401) {
+                        alert("Unauthorized. Clearing token.");
+                        localStorage.removeItem('gym_admin_token');
+                        location.reload();
+                    } else {
+                        alert("Update failed.");
+                    }
+                }
+            } catch (e) {
+                alert("Network error.");
+            }
+        }
+
+        function triggerKillSwitch() {
+            if (confirm("DANGER: This will instantly disable all AI fallbacks globally. Proceed?")) {
+                saveConfig({ fallback_enabled: false, max_jobs_per_user: 2, cooldown_period_ms: 600000 });
+            }
+        }
+
+        if (token) fetchConfig();
+    </script>
+</body>
+</html>

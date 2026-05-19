@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Skill Gym - Train your prompt IQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-btn {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .result-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .result-section h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .score-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-box,
+        .prompt-box,
+        .explanation-box {
+            background: #f8f9ff;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #c33;
+            margin-bottom: 1rem;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #3c3;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-box {
+            background: #f0f4ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .challenge-box h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .levels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .level-btn {
+                padding: 1rem;
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .level-btn {
+            transition: all 0.3s ease;
+        }
+
+        .level-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .results {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .stat-card, .level-stat {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 0.5rem;
+        }
+
+        .level-stat h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .level-stat p {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="store.js"></script>
+</head>
+<body>
+    <!-- Hidden form for Netlify parsing -->
+    <form name="task-feedback" data-netlify="true" netlify-honeypot="bot-field" hidden>
+        <input name="bot-field" />
+        <input type="text" name="task_clarity" />
+        <input type="text" name="difficulty" />
+        <textarea name="feedback"></textarea>
+    </form>
+
+    <div class="container">
+        <header>
+            <h1>🎓 AI Skill Gym</h1>
+            <p>Train your prompt IQ</p>
+            <button class="btn btn-secondary" onclick="toggleHistory()" style="margin-top: 1rem;">📊 View History</button>
+            <button class="btn btn-secondary" onclick="toggleLeaderboard()" style="margin-top: 1rem; margin-left: 1rem;">🏆 Leaderboard</button>
+        </header>
+
+        <div id="levelsGrid" class="levels-grid"></div>
+
+        <div id="historyContainer" class="card hidden">
+            <h2>📊 History</h2>
+            <div id="historyContent">
+                <!-- History will be populated here -->
+            </div>
+        </div>
+
+        <div id="leaderboardContainer" class="card hidden">
+            <h2>🏆 Personal Leaderboard</h2>
+            <div id="leaderboardContent">
+                <!-- Leaderboard will be populated here -->
+            </div>
+        </div>
+
+        <div id="challengeContainer" class="card hidden">
+            <div id="challengeContent"></div>
+
+            <form onsubmit="submitPrompt(event)">
+                <div class="form-group">
+                    <label for="userPrompt">Your Prompt</label>
+                    <textarea id="userPrompt" placeholder="Write your prompt here..." required></textarea>
+                    <small style="color: #999;">Character count: <span id="charCount">0</span></small>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">✨ Get Evaluation</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">← Back</button>
+                </div>
+            </form>
+
+            <div id="resultsContainer" class="results hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        const CHALLENGES = {
+            1: [
+                "Explain what an LLM is like you're talking to a 10-year-old.",
+                "What is AI hallucination? Give an example of when it might happen.",
+                "List 5 scenarios where you should NOT trust AI output.",
+                "Describe the difference between supervised and unsupervised learning.",
+                "What are the ethical concerns with AI development?",
+                "How does reinforcement learning work? Give a simple example.",
+                "What is prompt engineering and why is it important?",
+                "Explain overfitting in machine learning."
+            ],
+            2: [
+                "Write a prompt where you assign AI a role as 'Senior Marketing Executive' and ask for strategy for a coffee brand.",
+                "Request a restaurant review in JSON format with: rating, cuisine, price_range, pros, cons, recommendation.",
+                "Write a product description prompt that is: under 100 words, includes 3 benefits, conversational tone, highlights eco-friendly aspect.",
+                "Create a prompt for writing a professional email with specific tone and structure requirements.",
+                "Write a prompt for generating creative story ideas with specific genre and character constraints.",
+                "Create a prompt for analyzing customer feedback with sentiment and key themes.",
+                "Write a prompt for generating code documentation with examples and usage.",
+                "Create a prompt for designing a user interface with accessibility considerations."
+            ],
+            3: [
+                "Create a blog post outline about 'Remote Work Best Practices' targeting busy managers with SEO considerations.",
+                "Generate an email response template for customer support covering: shipping, returns, refunds.",
+                "Request a Python function that validates emails with error handling, type hints, and docstring.",
+                "Write a prompt for creating a social media content calendar for a small business.",
+                "Create a prompt for generating interview questions for a software developer position.",
+                "Write a prompt for analyzing financial data and providing investment recommendations.",
+                "Create a prompt for designing a lesson plan for teaching programming to beginners.",
+                "Write a prompt for generating personalized workout plans based on user goals."
+            ],
+            4: [
+                "Optimize a verbose prompt about customer feedback analysis to be as concise as possible.",
+                "Write a prompt to summarize a 10-page research paper into 1-page executive summary.",
+                "Write 3 connected prompts: 1) Generate startup ideas, 2) Evaluate top ideas, 3) Create pitch for winner.",
+                "Create a prompt chain for writing a novel: outline, character development, plot points, dialogue.",
+                "Optimize a prompt for generating high-quality images with specific style and composition.",
+                "Write a prompt for multi-step problem solving with intermediate checkpoints.",
+                "Create a prompt for automated code review with specific criteria and feedback format.",
+                "Write a prompt for generating personalized learning paths based on skill assessment."
+            ]
+        };
+
+        let selectedLevel = null;
+        let userProgress = loadProgress();
+
+        function loadProgress() {
+            const progress = localStorage.getItem('aiSkillGymProgress');
+            return progress ? JSON.parse(progress) : {
+                level1: { attempts: 0, bestScore: 0 },
+                level2: { attempts: 0, bestScore: 0 },
+                level3: { attempts: 0, bestScore: 0 },
+                level4: { attempts: 0, bestScore: 0 },
+                history: []
+            };
+        }
+
+        function saveProgress() {
+            localStorage.setItem('aiSkillGymProgress', JSON.stringify(userProgress));
+            const userId = localStorage.getItem('aiSkillGymUserId') || crypto.randomUUID();
+            localStorage.setItem('aiSkillGymUserId', userId);
+            
+            // Queue critical sync
+            if (window.appStore) {
+                window.appStore.enqueue({
+                    url: '/api/data',
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, progress: userProgress })
+                }, 'CRITICAL');
+            }
+        }
+
+        function renderLevels() {
+            const levelsGrid = document.getElementById('levelsGrid');
+            const levels = [
+                { id: 1, emoji: '🧠', name: 'Level 1', desc: 'AI Literacy', progress: userProgress.level1 },
+                { id: 2, emoji: '🎯', name: 'Level 2', desc: 'Structured', progress: userProgress.level2 },
+                { id: 3, emoji: '🚀', name: 'Level 3', desc: 'Applied', progress: userProgress.level3 },
+                { id: 4, emoji: '⚡', name: 'Level 4', desc: 'Optimization', progress: userProgress.level4 }
+            ];
+
+            levelsGrid.innerHTML = levels.map(level => `
+                <button class="level-btn" onclick="selectLevel(${level.id})">
+                    <div>${level.emoji}</div>
+                    <div>${level.name}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">${level.desc}</div>
+                    <div style="font-size: 0.8rem; margin-top: 0.5rem;">Best: ${level.progress.bestScore}/10 (${level.progress.attempts} attempts)</div>
+                </button>
+            `).join('');
+        }
+
+        // Initialize levels on load
+        renderLevels();
+
+        function selectLevel(level) {
+            selectedLevel = level;
+            const challenge = CHALLENGES[level][Math.floor(Math.random() * CHALLENGES[level].length)];
+            showChallenge(level, challenge);
+        }
+
+        function showChallenge(level, challenge) {
+            const container = document.getElementById('challengeContainer');
+            const content = document.getElementById('challengeContent');
+
+            content.innerHTML = `
+                <h2>Level ${level} Challenge</h2>
+                <div class="challenge-box">
+                    <h3>📋 Challenge</h3>
+                    <p>${challenge}</p>
+                </div>
+            `;
+
+            document.getElementById('userPrompt').value = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('resultsContainer').classList.add('hidden');
+            container.classList.remove('hidden');
+
+            document.getElementById('userPrompt').addEventListener('input', (e) => {
+                document.getElementById('charCount').textContent = e.target.value.length;
+            });
+        }
+
+        async function submitPrompt(e) {
+            e.preventDefault();
+
+            const userPrompt = document.getElementById('userPrompt').value.trim();
+            if (!userPrompt) return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Evaluating...';
+
+            try {
+                // Determine backpressure cooldown
+                if (window.appStore?.isBackendDegraded()) {
+                    console.warn("Backend degraded. Using Puter.js directly.");
+                    throw new Error("Backend degraded");
+                }
+
+                const idempotencyKey = window.appStore ? window.appStore.generateIdempotencyKey('train', userPrompt) : crypto.randomUUID();
+                const jobId = crypto.randomUUID();
+
+                const response = await fetch('/api/train', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        challenge: `Level ${selectedLevel} Challenge`,
+                        userPrompt: userPrompt,
+                        idempotencyKey,
+                        jobId
+                    })
+                });
+
+                if (response.headers.get('x-backend-health') === 'degraded' && window.appStore) {
+                    window.appStore.tripCircuitBreaker();
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                // Poll for completion (max 10 seconds)
+                let attempts = 0;
+                let result = null;
+                while (attempts < 10) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const pollRes = await fetch(`/api/train/poll?jobId=${jobId}`);
+                    if (pollRes.ok) {
+                        const job = await pollRes.json();
+                        if (job.status === 'complete') {
+                            result = job.result;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+
+                if (!result) throw new Error("Evaluation timed out");
+                displayResults(result);
+
+            } catch (error) {
+                console.warn("Netlify Train failed, falling back to puter.ai...", error);
+                
+                try {
+                    const fallbackPrompt = `Evaluate this prompt for the challenge: "Level ${selectedLevel} Challenge"\nPrompt: "${userPrompt}"\nReturn ONLY raw JSON in this exact format: {"critique": "...", "improvedPrompt": "...", "explanation": "...", "score": 7}`;
+                    
+                    const puterResponse = await puter.ai.chat(fallbackPrompt, { model: 'claude-3-5-sonnet' });
+                    const responseText = typeof puterResponse === 'string' ? puterResponse : puterResponse.message?.content?.[0]?.text;
+                    const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const result = JSON.parse(cleanJson);
+                    
+                    displayResults(result);
+                } catch (puterError) {
+                    document.getElementById('resultsContainer').innerHTML = `
+                        <div class="error">
+                            <strong>System Offline:</strong> Evaluation failed on both primary and fallback systems.<br>
+                            Please check your connection and try again.
+                        </div>
+                    `;
+                    document.getElementById('resultsContainer').classList.remove('hidden');
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✨ Get Evaluation';
+            }
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✨ Get Evaluation';
+            }
+        }
+
+        function displayResults(result) {
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            // Update progress
+            const levelKey = `level${selectedLevel}`;
+            userProgress[levelKey].attempts++;
+            if (result.score > userProgress[levelKey].bestScore) {
+                userProgress[levelKey].bestScore = result.score;
+            }
+            userProgress.history.push({
+                level: selectedLevel,
+                score: result.score,
+                timestamp: new Date().toISOString(),
+                challenge: document.querySelector('.challenge-box p').textContent,
+                userPrompt: document.getElementById('userPrompt').value
+            });
+            saveProgress();
+            renderLevels(); // Update level buttons with new progress
+
+            resultsContainer.innerHTML = `
+                <h3>Evaluation Results</h3>
+
+                <div class="score-badge">Score: ${result.score}/10</div>
+
+                <div class="result-section">
+                    <h3>📝 Feedback</h3>
+                    <div class="feedback-box">${escapeHtml(result.feedback)}</div>
+                </div>
+
+                <div class="result-section">
+                    <h3>⭐ Improved Prompt</h3>
+                    <div class="prompt-box">${escapeHtml(result.improved_prompt)}</div>
+                </div>
+
+                <div class="result-section">
+                    <h3>💡 Why It's Better</h3>
+                    <div class="explanation-box">${escapeHtml(result.explanation)}</div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem; background: #fff8f0; border: 1px solid #ffe4c4;">
+                    <h3>📝 Quick Feedback</h3>
+                    <form onsubmit="submitFeedback(event)" name="task-feedback" data-netlify="true">
+                        <input type="hidden" name="form-name" value="task-feedback">
+                        <p style="display: none;"><label>Don’t fill this out if you're human: <input name="bot-field" /></label></p>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <label>Task Clarity (1-5)</label>
+                            <input type="number" name="task_clarity" min="1" max="5" required style="width: 100%; padding: 0.5rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Difficulty</label>
+                            <select name="difficulty" style="width: 100%; padding: 0.5rem;" required>
+                                <option value="Too easy">Too easy</option>
+                                <option value="Just right" selected>Just right</option>
+                                <option value="Too hard">Too hard</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>What was confusing? (Optional)</label>
+                            <textarea name="feedback" style="width: 100%; padding: 0.5rem;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Submit Feedback</button>
+                    </form>
+                    <p id="feedback-success" class="hidden" style="color: #3c3; margin-top: 1rem;">Thanks for your feedback!</p>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="tryAnother()">🎲 Try Another Challenge</button>
+                </div>
+            `;
+
+            resultsContainer.classList.remove('hidden');
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function tryAnother() {
+            selectLevel(selectedLevel);
+        }
+
+        function submitFeedback(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(() => {
+                form.style.display = 'none';
+                document.getElementById('feedback-success').classList.remove('hidden');
+            })
+            .catch(err => console.error('Feedback error:', err));
+        }
+
+        function resetForm() {
+            document.getElementById('challengeContainer').classList.add('hidden');
+            selectedLevel = null;
+        }
+
+        function toggleHistory() {
+            const historyContainer = document.getElementById('historyContainer');
+            const historyContent = document.getElementById('historyContent');
+
+            if (historyContainer.classList.contains('hidden')) {
+                // Show history
+                const history = userProgress.history.slice().reverse(); // Most recent first
+                if (history.length === 0) {
+                    historyContent.innerHTML = '<p>No attempts yet. Start practicing!</p>';
+                } else {
+                    historyContent.innerHTML = history.map(attempt => `
+                        <div class="history-item" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <strong>Level ${attempt.level}</strong>
+                                <span class="score-badge" style="font-size: 0.9rem;">${attempt.score}/10</span>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">${new Date(attempt.timestamp).toLocaleString()}</p>
+                            <p style="font-weight: 500; margin-bottom: 0.5rem;">${escapeHtml(attempt.challenge)}</p>
+                            <details>
+                                <summary style="cursor: pointer; color: #667eea;">View your prompt</summary>
+                                <div style="background: #f8f9ff; padding: 0.5rem; margin-top: 0.5rem; border-radius: 4px; font-family: monospace; white-space: pre-wrap;">${escapeHtml(attempt.userPrompt)}</div>
+                            </details>
+                        </div>
+                    `).join('');
+                }
+                historyContainer.classList.remove('hidden');
+            } else {
+                historyContainer.classList.add('hidden');
+            }
+        }
+
+        function toggleLeaderboard() {
+            const leaderboardContainer = document.getElementById('leaderboardContainer');
+            const leaderboardContent = document.getElementById('leaderboardContent');
+
+            if (leaderboardContainer.classList.contains('hidden')) {
+                // Calculate stats
+                const totalAttempts = userProgress.level1.attempts + userProgress.level2.attempts + userProgress.level3.attempts + userProgress.level4.attempts;
+                const averageScore = totalAttempts > 0 ? 
+                    ((userProgress.level1.bestScore + userProgress.level2.bestScore + userProgress.level3.bestScore + userProgress.level4.bestScore) / 4).toFixed(1) : 0;
+                const completedLevels = [userProgress.level1, userProgress.level2, userProgress.level3, userProgress.level4]
+                    .filter(level => level.attempts > 0).length;
+
+                leaderboardContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="stat-card">
+                            <h3>Total Attempts</h3>
+                            <div class="stat-value">${totalAttempts}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Average Best Score</h3>
+                            <div class="stat-value">${averageScore}/10</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Levels Tried</h3>
+                            <div class="stat-value">${completedLevels}/4</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Master Level</h3>
+                            <div class="stat-value">${Math.max(userProgress.level1.bestScore, userProgress.level2.bestScore, userProgress.level3.bestScore, userProgress.level4.bestScore)}/10</div>
+                        </div>
+                    </div>
+                    <h3>Level Performance</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="level-stat">
+                            <h4>🧠 Level 1</h4>
+                            <p>Best: ${userProgress.level1.bestScore}/10</p>
+                            <p>Attempts: ${userProgress.level1.attempts}</p>
+                        </div>
+                        <div class="level-stat">
+                            <h4>🎯 Level 2</h4>
+                            <p>Best: ${userProgress.level2.bestScore}/10</p>
+                            <p>Attempts: ${userProgress.level2.attempts}</p>
+                        </div>
+                        <div class="level-stat">
+                            <h4>🚀 Level 3</h4>
+                            <p>Best: ${userProgress.level3.bestScore}/10</p>
+                            <p>Attempts: ${userProgress.level3.attempts}</p>
+                        </div>
+                        <div class="level-stat">
+                            <h4>⚡ Level 4</h4>
+                            <p>Best: ${userProgress.level4.bestScore}/10</p>
+                            <p>Attempts: ${userProgress.level4.attempts}</p>
+                        </div>
+                    </div>
+                `;
+                leaderboardContainer.classList.remove('hidden');
+            } else {
+                leaderboardContainer.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
